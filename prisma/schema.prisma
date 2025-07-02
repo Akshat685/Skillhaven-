@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(cuid())
+  name             String?
+  email            String?            @unique
+  image            String?
+  freelancer       FreelancerProfile?
+  enrollments      Enrollment[]
+  completedLessons CompletedLesson[]
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  title       String
+  modules     Module[]
+  enrollments Enrollment[]
+}
+
+model Module {
+  id       String   @id @default(cuid())
+  title    String
+  courseId String
+  lessons  Lesson[]
+  course   Course   @relation(fields: [courseId], references: [id])
+}
+
+model Lesson {
+  id              String            @id @default(cuid())
+  title           String
+  slug            String            @unique
+  moduleId        String
+  module          Module            @relation(fields: [moduleId], references: [id])
+  CompletedLesson CompletedLesson[]
+}
+
+model Enrollment {
+  id       String @id @default(cuid())
+  userId   String
+  courseId String
+  user     User   @relation(fields: [userId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id])
+}
+
+model CompletedLesson {
+  id       String @id @default(cuid())
+  userId   String
+  lessonId String
+  user     User   @relation(fields: [userId], references: [id])
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+}
+
+model FreelancerProfile {
+  id     String   @id @default(cuid())
+  bio    String
+  skills String[]
+  userId String   @unique
+  user   User     @relation(fields: [userId], references: [id])
+}
