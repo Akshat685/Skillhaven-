@@ -1,8 +1,6 @@
 // tailwind.config.js
-module.exports = {
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
+export const content = ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'];
+export const theme = {
+  extend: {},
 };
+export const plugins = [];

@@ -1,3 +1,4 @@
+// skillhaven-studio/schemas/lesson.ts
 const lesson = {
   name: "lesson",
   title: "Lesson",
@@ -22,15 +23,8 @@ const lesson = {
       title: "Content",
       type: "array",
       of: [
-        {
-          type: "block",
-        },
-        {
-          type: "code",
-          options: {
-            language: "javascript",
-          },
-        },
+        { type: "block" },
+        { type: "code", options: { language: "javascript" } },
       ],
     },
   ],

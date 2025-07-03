@@ -1,4 +1,5 @@
-// app/page.tsx
+"use client"; // ✅ Ensures this is treated as a Client Component
+
 import Link from "next/link";
 
 export default function Home() {

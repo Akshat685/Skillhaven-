@@ -1,51 +1,84 @@
 "use client";
-import { gql, useQuery } from "@apollo/client";
-import { useParams } from "next/navigation";
+import { gql, useQuery, useMutation } from "@apollo/client";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
-const GET_COURSE_DETAIL = gql`
-  query ($id: ID!) {
-    courses {
+const GET_COURSE = gql`
+  query Course($id: ID!) {
+    course(id: $id) {
       id
       title
-      modules {
-        id
-        title
-        lessons {
-          id
-          title
-          slug
-        }
-      }
+      description
     }
   }
 `;
 
-export default function CoursePage() {
+const UPDATE_COURSE = gql`
+  mutation UpdateCourse($id: ID!, $title: String!, $description: String!) {
+    updateCourse(id: $id, title: $title, description: $description) {
+      id
+      title
+      description
+    }
+  }
+`;
+
+export default function EditCoursePage() {
   const params = useParams();
-  const id = params && typeof params.id === "string" ? params.id : Array.isArray(params?.id) ? params?.id[0] : undefined;
-  const { data, loading } = useQuery(GET_COURSE_DETAIL);
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const router = useRouter();
+
+  const { data, loading } = useQuery(GET_COURSE, {
+    variables: { id },
+  });
+
+  const [updateCourse] = useMutation(UPDATE_COURSE);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (data?.course) {
+      setTitle(data.course.title);
+      setDescription(data.course.description);
+    }
+  }, [data]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await updateCourse({ variables: { id, title, description } });
+    router.push("/admin/courses");
+  };
 
   if (loading) return <p>Loading...</p>;
 
-  const course = data?.courses.find((c: any) => c.id === id);
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">{course.title}</h1>
-      {course.modules.map((mod: any) => (
-        <div key={mod.id} className="mt-4">
-          <h2 className="text-lg font-semibold">{mod.title}</h2>
-          <ul className="list-disc ml-6">
-            {mod.lessons.map((lesson: any) => (
-              <li key={lesson.id}>
-                <a href={`/lesson/${lesson.slug}`} className="text-blue-600 hover:underline">
-                  {lesson.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+    <div>
+      <h2 className="text-xl font-semibold mb-4">✏️ Edit Course</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <div>
+          <label className="block font-medium">Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border rounded p-2"
+          />
         </div>
-      ))}
+        <div>
+          <label className="block font-medium">Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full border rounded p-2"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Update Course
+        </button>
+      </form>
     </div>
   );
 }

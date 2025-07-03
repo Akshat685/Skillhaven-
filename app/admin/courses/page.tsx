@@ -7,24 +7,38 @@ const GET_COURSES = gql`
     courses {
       id
       title
+      description
     }
   }
 `;
 
-export default function CourseList() {
-  const { data, loading } = useQuery(GET_COURSES);
+export default function AdminCoursesPage() {
+  const { data, loading, error } = useQuery(GET_COURSES);
 
   if (loading) return <p>Loading...</p>;
+  if (error) return <p>Failed to load courses</p>;
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Courses</h2>
+    <div>
+      <h2 className="text-xl font-semibold mb-4">📘 Manage Courses</h2>
       <ul className="space-y-4">
         {data.courses.map((course: any) => (
-          <li key={course.id} className="bg-white p-4 shadow rounded">
-            <Link href={`/courses/${course.id}`} className="text-blue-600 hover:underline">
-              {course.title}
-            </Link>
+          <li
+            key={course.id}
+            className="p-4 border rounded hover:bg-gray-100 transition"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="font-medium">{course.title}</h3>
+                <p className="text-sm text-gray-600">{course.description}</p>
+              </div>
+              <Link
+                href={`/admin/courses/${course.id}`}
+                className="text-blue-600 hover:underline"
+              >
+                ✏️ Edit
+              </Link>
+            </div>
           </li>
         ))}
       </ul>

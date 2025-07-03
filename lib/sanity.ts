@@ -1,11 +1,11 @@
 // lib/sanity.ts
-import { createClient } from '@sanity/client';
+import { createClient } from "next-sanity";
 
-const sanityClient = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
-  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+export const sanityConfig = {
+  projectId: process.env.SANITY_PROJECT_ID,
+  dataset: process.env.SANITY_DATASET,
+  apiVersion: "2023-07-01",
   useCdn: true,
-  apiVersion: '2023-01-01',
-});
+};
 
-export default sanityClient;
+export const getClient = () => createClient(sanityConfig);
